@@ -1,2 +1,2 @@
 # avl-python
-AVL Tree in Python
+Rewrite of [avl-cont](https://github.com/tonijarjour/avl-cont) in Python.
