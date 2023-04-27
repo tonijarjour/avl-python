@@ -208,6 +208,8 @@ class Tree:
     def remove_root_helper(self, value):
         root = self.data[self.root]
         if value == root.value:
+            return_val = None
+
             if self.size == 1:
                 return_val = self.data.pop().value
                 self.free.clear()
@@ -215,27 +217,21 @@ class Tree:
                 self.root = 0
                 self.size = 0
 
-                return True, return_val
-
             if not root.right:
                 return_val = self.data[self.root].value
                 self.free.append(self.root)
                 self.root = root.left
                 self.size -= 1
-
                 self.clean_tail()
-                return True, return_val
 
             if not root.left:
                 return_val = self.data[self.root].value
                 self.free.append(self.root)
                 self.root = root.right
                 self.size -= 1
-
                 self.clean_tail()
-                return True, return_val
 
-            return True, None
+            return True, return_val
         return False, None
 
     def remove(self, value):
@@ -345,3 +341,12 @@ class Tree:
         self.clean_tail()
         self.size -= 1
         return return_val
+
+if __name__ == "__main__":
+    tree = Tree()
+
+    for n in range(1000):
+        tree.insert(n)
+
+    for n in range(400,600):
+        tree.remove(n)
