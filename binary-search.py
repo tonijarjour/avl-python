@@ -5,12 +5,14 @@ AVL Tree practice
 import typing
 import collections
 
+
 class Node:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
         self.height = 0
+
 
 class Tree:
     def __init__(self):
@@ -344,6 +346,7 @@ class Tree:
         self.size -= 1
         return return_val
 
+
 class Iter:
     def __init__(self, data, root):
         self.data = data
@@ -366,13 +369,14 @@ class Iter:
         else:
             raise StopIteration
 
+
 if __name__ == "__main__":
     tree = Tree()
 
     for n in range(1000):
         tree.insert(n)
 
-    for n in range(400,600):
+    for n in range(400, 600):
         tree.remove(n)
 
     iter_tree = Iter(tree.data, tree.get_root())
