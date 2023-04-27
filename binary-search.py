@@ -13,6 +13,9 @@ class Node:
         self.right = None
         self.height = 0
 
+    def __repr__(self):
+        return "{}".format(self.value)
+
 
 class Tree:
     def __init__(self):
@@ -376,9 +379,10 @@ if __name__ == "__main__":
     for n in range(1000):
         tree.insert(n)
 
+    print(tree.get_node(tree.get_root()))
+
     for n in range(400, 600):
         tree.remove(n)
 
-    iter_tree = Iter(tree.data, tree.get_root())
-    for n in iter_tree:
-        print(n)
+    #for n in Iter(tree.data, tree.get_root()):
+    #    print(n)
