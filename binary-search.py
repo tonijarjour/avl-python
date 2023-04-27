@@ -350,28 +350,24 @@ class Tree:
         self.size -= 1
         return return_val
 
+    def iter(self, n=None):
+        queue = collections.deque([self.root])
 
-class Iter:
-    def __init__(self, data, root):
-        self.data = data
-        self.queue = collections.deque([root])
+        if not n:
+            n = len(self)
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if len(self.queue) > 0:
-            current = self.data[self.queue.popleft()]
+        step = 0
+        while len(queue) > 0 and step < n:
+            current = self.data[queue.popleft()]
 
             if current.left is not None:
-                self.queue.append(current.left)
+                queue.append(current.left)
 
             if current.right is not None:
-                self.queue.append(current.right)
+                queue.append(current.right)
 
-            return current.value
-        else:
-            raise StopIteration
+            step += 1
+            yield current.value
 
 
 class Test(unittest.TestCase):
@@ -394,6 +390,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(self.tree.position(512), None)
         self.assertEqual(self.tree.position(499), None)
+
+        for v in self.tree.iter(16):
+            print(v)
 
 
 if __name__ == "__main__":
