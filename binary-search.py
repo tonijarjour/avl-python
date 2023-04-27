@@ -15,7 +15,7 @@ class Node:
         self.height = 0
 
     def __repr__(self):
-        return "{}".format(self.value)
+        return "{!r}".format(self.value)
 
 
 class Tree:
@@ -36,6 +36,112 @@ class Tree:
 
     def get_root(self):
         return self.root
+
+    def iter(self, n=None):
+        queue = collections.deque([self.root])
+
+        if not n:
+            n = len(self)
+
+        step = 0
+        while len(queue) > 0 and step < n:
+            current = self.data[queue.popleft()]
+
+            if current.left is not None:
+                queue.append(current.left)
+
+            if current.right is not None:
+                queue.append(current.right)
+
+            step += 1
+            yield current.value
+
+    def update_height(self, index):
+        node = self.data[index]
+        left = node.left
+        right = node.right
+
+        left_height = -1
+        right_height = -1
+
+        if left is not None:
+            left_height = self.data[left].height
+        if right is not None:
+            right_height = self.data[right].height
+
+        self.data[index].height = 1 + max(left_height, right_height)
+
+        return right_height - left_height
+
+    def rotate_left(self, index):
+        left = self.data[index].left
+        left_right = self.data[left].right
+
+        self.data[index].left = left_right
+        self.data[left].right = index
+
+        self.update_height(index)
+        self.update_height(left)
+
+        return left
+
+    def rotate_right(self, index):
+        right = self.data[index].right
+        right_left = self.data[right].left
+
+        self.data[index].right = right_left
+        self.data[right].left = index
+
+        self.update_height(index)
+        self.update_height(right)
+
+        return right
+
+    def rotate_left_right(self, index):
+        left = self.data[index].left
+
+        self.data[index].left = self.rotate_left(left)
+        return self.rotate_right(index)
+
+    def rotate_right_left(self, index):
+        right = self.data[index].right
+
+        self.data[index].right = self.rotate_right(right)
+        return self.rotate_left(index)
+
+    def balance_node(self, index, balance_factor):
+        node = self.data[index]
+
+        match balance_factor:
+            case -2:
+                left = self.data[node.left]
+                if left is not None:
+                    return self.rotate_right(index)
+                else:
+                    return self.rotate_left_right(index)
+            case 2:
+                right = self.data[node.right]
+                if right is not None:
+                    return self.rotate_right(index)
+                else:
+                    return self.rotate_right_left(index)
+            case _:
+                return index
+
+    def update_and_balance(self, visited):
+        while len(visited) > 0:
+            index = visited.pop()
+            balance_factor = self.update_height(index)
+            new_parent = self.balance_node(index, balance_factor)
+
+            if len(visited) > 0:
+                grandfather = self.data[visited[-1]]
+                if index == grandfather.left:
+                    self.data[visited[-1]].left = new_parent
+                else:
+                    self.data[visited[-1]].right = new_parent
+            else:
+                self.root = new_parent
 
     @typing.overload
     def position_helper(self, value) -> tuple[typing.Literal[False], list[int]]:
@@ -118,93 +224,6 @@ class Tree:
         self.update_and_balance(visited)
         self.size += 1
         return index
-
-    def rotate_left(self, index):
-        left = self.data[index].left
-        left_right = self.data[left].right
-
-        self.data[index].left = left_right
-        self.data[left].right = index
-
-        self.update_height(index)
-        self.update_height(left)
-
-        return left
-
-    def rotate_right(self, index):
-        right = self.data[index].right
-        right_left = self.data[right].left
-
-        self.data[index].right = right_left
-        self.data[right].left = index
-
-        self.update_height(index)
-        self.update_height(right)
-
-        return right
-
-    def rotate_left_right(self, index):
-        left = self.data[index].left
-
-        self.data[index].left = self.rotate_left(left)
-        return self.rotate_right(index)
-
-    def rotate_right_left(self, index):
-        right = self.data[index].right
-
-        self.data[index].right = self.rotate_right(right)
-        return self.rotate_left(index)
-
-    def update_height(self, index):
-        node = self.data[index]
-        left = node.left
-        right = node.right
-
-        left_height = -1
-        right_height = -1
-
-        if left is not None:
-            left_height = self.data[left].height
-        if right is not None:
-            right_height = self.data[right].height
-
-        self.data[index].height = 1 + max(left_height, right_height)
-
-        return right_height - left_height
-
-    def balance_node(self, index, balance_factor):
-        node = self.data[index]
-
-        match balance_factor:
-            case -2:
-                left = self.data[node.left]
-                if left is not None:
-                    return self.rotate_right(index)
-                else:
-                    return self.rotate_left_right(index)
-            case 2:
-                right = self.data[node.right]
-                if right is not None:
-                    return self.rotate_right(index)
-                else:
-                    return self.rotate_right_left(index)
-            case _:
-                return index
-
-    def update_and_balance(self, visited):
-        while len(visited) > 0:
-            index = visited.pop()
-            balance_factor = self.update_height(index)
-            new_parent = self.balance_node(index, balance_factor)
-
-            if len(visited) > 0:
-                grandfather = self.data[visited[-1]]
-                if index == grandfather.left:
-                    self.data[visited[-1]].left = new_parent
-                else:
-                    self.data[visited[-1]].right = new_parent
-            else:
-                self.root = new_parent
 
     def clean_tail(self):
         popped = []
@@ -350,25 +369,6 @@ class Tree:
         self.size -= 1
         return return_val
 
-    def iter(self, n=None):
-        queue = collections.deque([self.root])
-
-        if not n:
-            n = len(self)
-
-        step = 0
-        while len(queue) > 0 and step < n:
-            current = self.data[queue.popleft()]
-
-            if current.left is not None:
-                queue.append(current.left)
-
-            if current.right is not None:
-                queue.append(current.right)
-
-            step += 1
-            yield current.value
-
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -394,6 +394,14 @@ class Test(unittest.TestCase):
         for v in self.tree.iter(16):
             print(v)
 
+
+# insert(value) -> index | None
+# position(value) -> index | None
+# remove(value) -> value | None
+# get_node(index) -> node
+# get_root() -> index
+# __len__ -> size
+# iter(n=size) -> level order generator n times
 
 if __name__ == "__main__":
     unittest.main()
