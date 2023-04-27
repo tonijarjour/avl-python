@@ -17,6 +17,21 @@ class Node:
     def __repr__(self):
         return "{!r}".format(self.value)
 
+    def __eq__(self, other):
+        return self.value == other
+
+    def __lt__(self, other):
+        return self.value < other
+
+    def __le__(self, other):
+        return self.value <= other
+
+    def __gt__(self, other):
+        return self.value > other
+
+    def __ge__(self, other):
+        return self.value >= other
+
 
 class Tree:
     def __init__(self):
@@ -32,6 +47,9 @@ class Tree:
         return self.size == 0
 
     def get_node(self, index):
+        if index >= len(self.data):
+            return None
+
         return self.data[index]
 
     def get_root(self):
@@ -154,7 +172,7 @@ class Tree:
     def position_helper(self, value) -> tuple[bool, list[int] | None]:
         current = self.root
 
-        if value == self.data[current].value:
+        if value == self.data[current]:
             return True, None
 
         visited = [self.root]
@@ -162,15 +180,15 @@ class Tree:
         while (
             self.data[current].left is not None or self.data[current].right is not None
         ):
-            if value < self.data[current].value:
+            if value < self.data[current]:
                 current = self.data[current].left
-            elif value > self.data[current].value:
+            elif value > self.data[current]:
                 current = self.data[current].right
 
             if not current:
                 return False, visited
 
-            if value == self.data[current].value:
+            if value == self.data[current]:
                 return True, visited
 
             visited.append(current)
@@ -189,9 +207,9 @@ class Tree:
             case (True, indices):
                 parent = indices[-1]
 
-                if value < self.data[parent].value:
+                if value < self.data[parent]:
                     return self.data[parent].left
-                elif value > self.data[parent].value:
+                elif value > self.data[parent]:
                     return self.data[parent].right
 
     def insert_helper(self, value):
@@ -216,9 +234,9 @@ class Tree:
         parent = visited[-1]
         index = self.insert_helper(value)
 
-        if value < self.data[parent].value:
+        if value < self.data[parent]:
             self.data[parent].left = index
-        if value > self.data[parent].value:
+        if value > self.data[parent]:
             self.data[parent].right = index
 
         self.update_and_balance(visited)
@@ -234,7 +252,7 @@ class Tree:
 
     def remove_root_helper(self, value):
         root = self.data[self.root]
-        if value == root.value:
+        if value == root:
             return_val = None
 
             if self.size == 1:
@@ -280,7 +298,7 @@ class Tree:
 
         index = self.root
         if not is_root:
-            if value < parent_data.value:
+            if value < parent_data:
                 index = parent_data.left
             else:
                 index = parent_data.right
@@ -345,17 +363,17 @@ class Tree:
 
         else:
             if not data.left and not data.right:
-                if value < parent_data.value:
+                if value < parent_data:
                     self.data[parent].left = None
                 else:
                     self.data[parent].right = None
             elif data.left is not None:
-                if value < parent_data.value:
+                if value < parent_data:
                     self.data[parent].left = data.left
                 else:
                     self.data[parent].right = data.left
             else:
-                if value < parent_data.value:
+                if value < parent_data:
                     self.data[parent].left = data.right
                 else:
                     self.data[parent].right = data.right
@@ -383,7 +401,7 @@ class Test(unittest.TestCase):
 
         root_index = self.tree.get_root()
         self.assertEqual(root_index, 511)
-        self.assertEqual(self.tree.get_node(511).value, 512)
+        self.assertEqual(self.tree.get_node(511), 512)
 
         for n in range(400, 600):
             self.tree.remove(n)
@@ -398,7 +416,7 @@ class Test(unittest.TestCase):
 # insert(value) -> index | None
 # position(value) -> index | None
 # remove(value) -> value | None
-# get_node(index) -> node
+# get_node(index) -> node | None
 # get_root() -> index
 # __len__ -> size
 # iter(n=size) -> level order generator n times
