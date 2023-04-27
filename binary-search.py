@@ -3,7 +3,7 @@ AVL Tree practice
 """
 
 import typing
-
+import collections
 
 class Node:
     def __init__(self, value):
@@ -11,7 +11,6 @@ class Node:
         self.left = None
         self.right = None
         self.height = 0
-
 
 class Tree:
     def __init__(self):
@@ -28,6 +27,9 @@ class Tree:
 
     def get_node(self, index):
         return self.data[index]
+
+    def get_root(self):
+        return self.root
 
     @typing.overload
     def contains_helper(self, value) -> tuple[typing.Literal[False], list[int]]:
@@ -342,6 +344,28 @@ class Tree:
         self.size -= 1
         return return_val
 
+class Iter:
+    def __init__(self, data, root):
+        self.data = data
+        self.queue = collections.deque([root])
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if len(self.queue) > 0:
+            current = self.data[self.queue.popleft()]
+
+            if current.left is not None:
+                self.queue.append(current.left)
+
+            if current.right is not None:
+                self.queue.append(current.right)
+
+            return current.value
+        else:
+            raise StopIteration
+
 if __name__ == "__main__":
     tree = Tree()
 
@@ -350,3 +374,7 @@ if __name__ == "__main__":
 
     for n in range(400,600):
         tree.remove(n)
+
+    iter_tree = Iter(tree.data, tree.get_root())
+    for n in iter_tree:
+        print(n)
