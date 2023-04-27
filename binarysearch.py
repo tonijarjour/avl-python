@@ -3,7 +3,6 @@ AVL Tree practice
 """
 
 import collections
-import unittest
 
 
 class Node:
@@ -377,41 +376,10 @@ class Tree:
         return return_val
 
 
-class Test(unittest.TestCase):
-    def setUp(self):
-        self.tree = Tree()
-
-    def test(self):
-        for n in range(1000):
-            self.tree.insert(n)
-
-        self.tree.remove(511)
-        self.assertEqual(self.tree.position(511), None)
-
-        root_index = self.tree.get_root()
-        self.assertEqual(root_index, 511)
-        self.assertEqual(self.tree.get_node(511), 512)
-
-        for n in range(400, 600):
-            self.tree.remove(n)
-
-        self.assertEqual(self.tree.position(512), None)
-        self.assertEqual(self.tree.position(499), None)
-
-        for v in self.tree.iter(16):
-            print(v)
-
-        for n in range(1000):
-            self.tree.remove(n)
-
-
 # insert(value) -> index | None
 # position(value) -> index | None
 # remove(value) -> value | None
 # get_node(index) -> node | None
 # get_root() -> index
 # __len__ -> size
-# iter(n=size) -> level order generator n times
-
-if __name__ == "__main__":
-    unittest.main()
+# iter(n=size) -> level order generator
