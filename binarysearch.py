@@ -1,5 +1,12 @@
 """
-AVL Tree practice
+Contiguous AVL Tree
+
+get_root() -> index
+position(value) -> index | None
+get_node(index) -> node | None
+insert(value) -> index | None
+remove(value) -> value | None
+iter(n=size) -> level order iterator to nth node
 """
 
 import collections
@@ -374,12 +381,3 @@ class Tree:
         self.clean_tail()
         self.size -= 1
         return return_val
-
-
-# insert(value) -> index | None
-# position(value) -> index | None
-# remove(value) -> value | None
-# get_node(index) -> node | None
-# get_root() -> index
-# __len__ -> size
-# iter(n=size) -> level order generator
