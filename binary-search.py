@@ -4,6 +4,7 @@ AVL Tree practice
 
 import typing
 import collections
+import unittest
 
 
 class Node:
@@ -24,7 +25,7 @@ class Tree:
         self.root = 0
         self.size = 0
 
-    def get_len(self):
+    def __len__(self):
         return self.size
 
     def is_empty(self):
@@ -37,14 +38,14 @@ class Tree:
         return self.root
 
     @typing.overload
-    def contains_helper(self, value) -> tuple[typing.Literal[False], list[int]]:
+    def position_helper(self, value) -> tuple[typing.Literal[False], list[int]]:
         ...
 
     @typing.overload
-    def contains_helper(self, value) -> tuple[typing.Literal[True], list[int] | None]:
+    def position_helper(self, value) -> tuple[typing.Literal[True], list[int] | None]:
         ...
 
-    def contains_helper(self, value) -> tuple[bool, list[int] | None]:
+    def position_helper(self, value) -> tuple[bool, list[int] | None]:
         current = self.root
 
         if value == self.data[current].value:
@@ -70,11 +71,11 @@ class Tree:
 
         return False, visited
 
-    def contains(self, value):
+    def position(self, value):
         if self.is_empty():
             return None
 
-        match self.contains_helper(value):
+        match self.position_helper(value):
             case (False, _):
                 return None
             case (True, None):
@@ -94,7 +95,7 @@ class Tree:
             return index
         else:
             self.data.append(Node(value))
-            return self.get_len()
+            return len(self)
 
     def insert(self, value):
         if self.is_empty():
@@ -102,7 +103,7 @@ class Tree:
             self.data.append(Node(value))
             return 0
 
-        found, visited = self.contains_helper(value)
+        found, visited = self.position_helper(value)
         if found:
             return None
 
@@ -249,7 +250,7 @@ class Tree:
         if return_val is not None:
             return return_val
 
-        found, visited = self.contains_helper(value)
+        found, visited = self.position_helper(value)
         if found and visited is None:
             visited = [self.root]
         elif not found:
@@ -373,16 +374,27 @@ class Iter:
             raise StopIteration
 
 
+class Test(unittest.TestCase):
+    def setUp(self):
+        self.tree = Tree()
+
+    def test(self):
+        for n in range(1000):
+            self.tree.insert(n)
+
+        self.tree.remove(511)
+        self.assertEqual(self.tree.position(511), None)
+
+        root_index = self.tree.get_root()
+        self.assertEqual(root_index, 511)
+        self.assertEqual(self.tree.get_node(511).value, 512)
+
+        for n in range(400, 600):
+            self.tree.remove(n)
+
+        self.assertEqual(self.tree.position(512), None)
+        self.assertEqual(self.tree.position(499), None)
+
+
 if __name__ == "__main__":
-    tree = Tree()
-
-    for n in range(1000):
-        tree.insert(n)
-
-    print(tree.get_node(tree.get_root()))
-
-    for n in range(400, 600):
-        tree.remove(n)
-
-    #for n in Iter(tree.data, tree.get_root()):
-    #    print(n)
+    unittest.main()
