@@ -2,7 +2,6 @@
 AVL Tree practice
 """
 
-import typing
 import collections
 import unittest
 
@@ -62,7 +61,7 @@ class Tree:
             n = len(self)
 
         step = 0
-        while len(queue) > 0 and step < n:
+        while queue and step < n:
             current = self.data[queue.popleft()]
 
             if current.left is not None:
@@ -91,7 +90,7 @@ class Tree:
 
         return right_height - left_height
 
-    def rotate_left(self, index):
+    def rotate_right(self, index):
         left = self.data[index].left
         left_right = self.data[left].right
 
@@ -103,7 +102,7 @@ class Tree:
 
         return left
 
-    def rotate_right(self, index):
+    def rotate_left(self, index):
         right = self.data[index].right
         right_left = self.data[right].left
 
@@ -132,27 +131,25 @@ class Tree:
 
         match balance_factor:
             case -2:
-                left = self.data[node.left]
-                if left is not None:
+                if self.data[node.left].left is not None:
                     return self.rotate_right(index)
                 else:
                     return self.rotate_left_right(index)
             case 2:
-                right = self.data[node.right]
-                if right is not None:
-                    return self.rotate_right(index)
+                if self.data[node.right].right is not None:
+                    return self.rotate_left(index)
                 else:
                     return self.rotate_right_left(index)
             case _:
                 return index
 
     def update_and_balance(self, visited):
-        while len(visited) > 0:
+        while visited:
             index = visited.pop()
             balance_factor = self.update_height(index)
             new_parent = self.balance_node(index, balance_factor)
 
-            if len(visited) > 0:
+            if visited:
                 grandfather = self.data[visited[-1]]
                 if index == grandfather.left:
                     self.data[visited[-1]].left = new_parent
@@ -161,19 +158,11 @@ class Tree:
             else:
                 self.root = new_parent
 
-    @typing.overload
-    def position_helper(self, value) -> tuple[typing.Literal[False], list[int]]:
-        ...
-
-    @typing.overload
-    def position_helper(self, value) -> tuple[typing.Literal[True], list[int] | None]:
-        ...
-
-    def position_helper(self, value) -> tuple[bool, list[int] | None]:
+    def position_helper(self, value) -> tuple[bool, list[int]]:
         current = self.root
 
         if value == self.data[current]:
-            return True, None
+            return True, []
 
         visited = [self.root]
 
@@ -185,7 +174,7 @@ class Tree:
             elif value > self.data[current]:
                 current = self.data[current].right
 
-            if not current:
+            if current is None:
                 return False, visited
 
             if value == self.data[current]:
@@ -202,7 +191,7 @@ class Tree:
         match self.position_helper(value):
             case (False, _):
                 return None
-            case (True, None):
+            case (True, []):
                 return self.root
             case (True, indices):
                 parent = indices[-1]
@@ -213,7 +202,7 @@ class Tree:
                     return self.data[parent].right
 
     def insert_helper(self, value):
-        if len(self.free) > 0:
+        if self.free:
             index = self.free.pop()
             self.data[index] = Node(value)
             return index
@@ -262,14 +251,14 @@ class Tree:
                 self.root = 0
                 self.size = 0
 
-            if not root.right:
+            elif not root.right:
                 return_val = self.data[self.root].value
                 self.free.append(self.root)
                 self.root = root.left
                 self.size -= 1
                 self.clean_tail()
 
-            if not root.left:
+            elif not root.left:
                 return_val = self.data[self.root].value
                 self.free.append(self.root)
                 self.root = root.right
@@ -288,7 +277,7 @@ class Tree:
             return return_val
 
         found, visited = self.position_helper(value)
-        if found and visited is None:
+        if found and not visited:
             visited = [self.root]
         elif not found:
             return None
@@ -411,6 +400,9 @@ class Test(unittest.TestCase):
 
         for v in self.tree.iter(16):
             print(v)
+
+        for n in range(1000):
+            self.tree.remove(n)
 
 
 # insert(value) -> index | None
